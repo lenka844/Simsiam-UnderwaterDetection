@@ -13,6 +13,7 @@ def build_dataset(cfg):
     ds_dict = args.ds_dict
     ds_name = ds_dict.pop('type')
     ds_dict['transform'] = transform
+    # print('======datset_dict======',datasets.__dict__)
     if hasattr(torchvision.datasets, ds_name):
         ds = getattr(torchvision.datasets, ds_name)(**ds_dict)
     else:

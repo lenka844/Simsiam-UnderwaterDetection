@@ -13,6 +13,7 @@ import torch.nn.functional as F
 
 from builder import build_optimizer, build_logger
 from models import SimSiam, build_model
+from models import SimSiam_pretrain
 from losses import build_loss
 from datasets import build_dataset, build_dataset_ccrop
 
@@ -111,7 +112,6 @@ def update_box(eval_train_loader, model, len_ds, logger, t=0.05):
         Hi, Wi = images.shape[-2:]
 
         for hmap in eval_train_map:
-            # print('=============',hmap)
             hmap = hmap.squeeze(0)  # (Hi, Wi)
 
             h_filter = (hmap.max(1)[0] > t).int()
@@ -249,7 +249,13 @@ def main_worker(rank, world_size, cfg):
 
     # build model, criterion; optimizer
     encoder = build_model(cfg.model)
-    model = SimSiam(encoder, **cfg.simsiam)  # cfg.simsiam.dim, pred_dim
+    encoder_weights = encoder.state_dict()
+    pthfile = '/home/ljh/self-detection/resnet50_torchvision.pth'
+    pretrained_dict = torch.load(pthfile)
+    encoder_weights.update(pretrained_dict)
+    encoder.load_state_dict(encoder_weights)
+    # model = SimSiam(encoder, **cfg.simsiam)  # cfg.simsiam.dim, pred_dim
+    model = SimSiam_pretrain(encoder, **cfg.simsiam)
     model = torch.nn.SyncBatchNorm.convert_sync_batchnorm(model)
     model.cuda()
     model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[cfg.local_rank])

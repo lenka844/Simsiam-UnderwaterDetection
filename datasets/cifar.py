@@ -35,7 +35,6 @@ class CIFAR100_boxes(datasets.CIFAR100):
     def __getitem__(self, index):
         img, target = self.data[index], self.targets[index]  # img:(H, W, C)=(32, 32, 3)
         img = Image.fromarray(img)
-
         if self.use_box:
             box = self.boxes[index].float().tolist()
             img = self.transform_ccrop([img, box])
