@@ -61,3 +61,4 @@ python DDP_linear.py configs/linear/IN1K_res50.py --load ./checkpoints/IN1K/moco
 ```
 
 More models and datasets coming soon.
+# Simsiam-UnderwaterDetection
